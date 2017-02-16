@@ -2,6 +2,11 @@
   <h1>{{title}}</h1>
   <div class="root">
     <div class="panel-north">
+
+      <ngb-timepicker [(ngModel)]="time"></ngb-timepicker>
+      <hr>
+      <pre>Selected time: {{time | json}}</pre>
+
     </div>
     <div class="panel-east">
     </div>

@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class DesignerComponent {
   title = 'Metro Designer';
+  time = {hour: 13, minute: 30};
 }
