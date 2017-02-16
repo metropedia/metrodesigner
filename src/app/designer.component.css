@@ -1,0 +1,14 @@
+.root {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+.panel-north {
+  flex: 1 1 100%;
+  overflow: hidden;
+}
+.panel-east {
+  flex: 1 0 450px;
+  background: rgba(0, 0, 0, .05);
+  padding: 0 10px;
+}
