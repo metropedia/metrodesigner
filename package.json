@@ -5,7 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "cp -r ~/projects/metrojs/src/core-modules/*.js src/vendor/metrojs/. && ng serve",
+    "start": "cp -r ~/projects/metrojs/src/core-modules/*.js src/vendor/metrojs/. && ng serve -e prod",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
