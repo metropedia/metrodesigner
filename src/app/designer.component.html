@@ -1,19 +1,46 @@
-<div>
-  <h1>{{title}}</h1>
-  <div class="root">
-    <div class="panel-north">
-      <div>
-        <div class="control-panel">
-          Width <input type="number" [(ngModel)]="app.canvasWidth"
-                      class="form-control">
-          Height <input type="number" [(ngModel)]="app.canvasHeight"
-                      class="form-control">
-          <button class="btn btn-xs">Set Size</button>
-        </div>
-        <div #container></div>
+<div class="root">
+  <div class="panel-north">
+    <div>
+      <div class="control-panel">
+        Width <input type="number" [(ngModel)]="app.canvasWidth"
+                    class="form-control">
+        Height <input type="number" [(ngModel)]="app.canvasHeight"
+                    class="form-control">
+        <button class="btn btn-sm">Set Size</button>
       </div>
+      <div class="control-panel">
+        <button class="btn btn-sm"
+                [disabled]="0"
+                (click)="newMetroLine();">New Metro Line</button>
+        <div class="toolset-primary btn-group btn-group-sm">
+          <button class="btn btn-sm"
+                  [ngClass]="{'btn-primary': app.inputMode == 'draw'}"
+                  (click)="draw();">Draw</button>
+          <button class="btn btn-sm"
+                  [ngClass]="{'btn-primary': app.inputMode == 'edit'}"
+                  (click)="editMetroLine();">Edit</button>
+          <!--Metro Station Implement-->
+        </div>
+
+        <button class="btn btn-sm">Save</button>
+  
+        <button class="btn btn-sm">Export</button>
+  
+        <button class="btn btn-sm"
+                (click)="zoomIn()">Zoom In +</button>
+  
+        <button class="btn btn-sm"
+                (click)="zoomOut()">Zoom Out -</button>
+  
+        <label>{{app.scalePercentage}}%</label>
+  
+        <button class="btn btn-sm"
+                (click)="center()">Center & 100%</button>
+
+      </div>
+      <div #container></div>
     </div>
-    <div class="panel-east">
-    </div>
+  </div>
+  <div class="panel-east" style="display:none;">
   </div>
 </div>
