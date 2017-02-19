@@ -38,9 +38,82 @@
                 (click)="center()">Center & 100%</button>
 
       </div>
+      <div class="control-panel"
+           [hidden]="app.inputMode != 'draw'">
+        <div class="btn-group btn-group-sm">
+          <button class="btn btn-sm"
+                  [ngClass]="{ 'btn-primary': app.pathType == 'straight' }"
+                  (click)="useStraightPath();">Straight</button>
+          <button class="btn btn-sm"
+                  [ngClass]="{ 'btn-primary': app.pathType == 'curly' }"
+                  (click)="useCurlyPath();">Curly</button>
+        </div>
+        <button class="btn btn-sm"
+                [disabled]="0"
+                (click)="flipLast();">flip</button>
+      </div>
+      <div class="control-panel input-group-sm"
+           [hidden]="app.inputMode != 'edit'">
+        <!--
+        <pre>{{app.currentEditJoint.data | json}}</pre>
+        -->
+        <label>
+        x1 <input type="number" step="20" [(ngModel)]="app.currentEditJoint.data.x1"
+                  readonly
+                  class="form-control"
+                  (change)="applyLinePathChange()">
+        </label>
+        <label>
+        y1 <input type="number" step="20" [(ngModel)]="app.currentEditJoint.data.y1"
+                  readonly
+                  class="form-control"
+                  (change)="applyLinePathChange()">
+        </label>
+        <label>
+        x2 <input type="number" step="20" [(ngModel)]="app.currentEditJoint.data.x2"
+                  readonly
+                  class="form-control"
+                  (change)="applyLinePathChange()">
+        </label>
+        <label>
+        y2 <input type="number" step="20" [(ngModel)]="app.currentEditJoint.data.y2"
+                  readonly
+                  class="form-control"
+                  (change)="applyLinePathChange()">
+        </label>
+        <label>type</label>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-sm"
+                    [ngClass]="{ 'btn-primary': app.currentEditJoint.data.type == 'straight' }"
+                    (click)="
+                      setCurrentEditJointType('straight');
+                      applyLinePathChange();
+                    ">Straight</button>
+            <button class="btn btn-sm"
+                    [ngClass]="{ 'btn-primary': app.currentEditJoint.data.type == 'curly' }"
+                    (click)="
+                      setCurrentEditJointType('curly');
+                      applyLinePathChange();
+                    ">Curly</button>
+          </div>
+        <label>
+        flipped
+          <input type="checkbox" [ngModel]="app.currentEditJoint.data.flipped"
+                 (ngModelChange)="evalTrueOrFalse($event)"
+                 (change)="applyLinePathChange()">
+        </label>
+        split
+          <button class="btn btn-sm"
+                  [disabled]="0"
+                  (click)="splitLinePath();">Split</button>
+      </div>
+      <div class="toolset-secondary "></div>
+      <!--sub toolset of Metro Implement-->
       <div #container></div>
     </div>
   </div>
   <div class="panel-east" style="display:none;">
+    <!--Default Developer Panel-->
+    <!--Plugin Panels-->
   </div>
 </div>

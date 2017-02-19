@@ -2,15 +2,26 @@ import { Component, ViewChild, ElementRef, ViewEncapsulation, NgZone } from '@an
 let Metro = require("../vendor/metrojs/metro").Metro;
 let metro = null;
 
+interface Line {
+  x1?: number;
+  x2?: number;
+  y1?: number;
+  y2?: number;
+};
+
+interface Joint {
+  data: Line;
+};
+
 interface App {
   canvasWidth?: number;
   canvasHeight?: number;
   inputMode?: string;
   pathType?: string;
   metroLines: any[];
-  currentEditJoint: any;
+  currentEditJoint: Joint;
   scalePercentage: number;
-}
+};
 
 @Component({
   selector: 'metro-designer',
@@ -22,14 +33,14 @@ export class DesignerComponent {
   public title: string = 'Metro Designer';
   public app: App = {
     metroLines: [],
-    currentEditJoint: null,
+    currentEditJoint: { data: {} },
     scalePercentage: 100.00,
   };
-  constructor(private zone: NgZone) {}
+  constructor(private zone: NgZone) {};
 
   @ViewChild('container') container:ElementRef;
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     let self = this;
     let app = this.app;
     let def = {
@@ -55,13 +66,13 @@ export class DesignerComponent {
 
   }
 
-  newMetroLine() {
+  newMetroLine(): void {
     const metroLine = metro.addMetroLine();
     metro.setCurrentMetroLine(metroLine);
     this.app.metroLines = metro.getMetroLines();
   };
 
-  draw() {
+  draw(): void {
     this.app.inputMode = metro.setInputMode('draw');
     const el = metro.getElements();
     el.pointer.
@@ -75,9 +86,9 @@ export class DesignerComponent {
     ;
   };
 
-  editMetroLine() {
+  editMetroLine(): void {
     this.app.inputMode = metro.setInputMode('edit');
-    var el = metro.getElements();
+    let el = metro.getElements();
     el.pointer.
       classed('hide', true)
     ;
@@ -89,15 +100,46 @@ export class DesignerComponent {
     ;
   };
 
-  zoomIn() {
+  zoomIn(): void {
     metro.zoomIn(1.5);
   }; 
 
-  zoomOut() {
+  zoomOut(): void {
     metro.zoomOut(0.75);
   }; 
 
-  center(x, y, k) {
+  center(x, y, k): void {
     metro.center(null, null, 1);
   }; 
+
+  useStraightPath() {
+    this.app.pathType = metro.setPathType('straight');
+  };
+
+  useCurlyPath(): void {
+    this.app.pathType = metro.setPathType('curly');
+  };
+
+  flipLast(): void {
+    let metroLine = metro.getCurrentMetroLine();
+    let layerMetroLine = metroLine.layers.metroLine;
+    let layerLinePaths = metroLine.layers.linePaths;
+    let layerJoints = metroLine.layers.joints;
+
+    let jointData = layerJoints.select('.joint:last-child').datum();
+    let linePath = jointData.linePath;
+    let linePathData = linePath.datum();
+    linePathData.flipped = !linePathData.flipped;
+    linePathData.linePath = metro.drawLinePath(
+      linePathData.x1, linePathData.y1,
+      linePathData.x2, linePathData.y2,
+      linePathData.type,
+      linePathData.flipped,
+      linePath
+    );
+  };
+
+  setCurrentEditJointType(type: string): void {
+    this.app.currentEditJoint.data.type = type;
+  };
 }
