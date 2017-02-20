@@ -78,7 +78,8 @@ path.rail {
   stroke-linejoin: round;
 }
 
-.pointer.hide {
+.pointer.hide,
+.shade.hide {
   display: none;
 }
 
