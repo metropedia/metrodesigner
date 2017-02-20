@@ -1,4 +1,11 @@
-<h1>
-  {{title}}
-</h1>
-<metro-designer >Loading...</metro-designer>
+<metro-designer
+  [plugins]="[{
+    name: 'MetroStation',
+    base: '../src/plugins/station/',
+    partials: {
+      'toolset-primary': 'toolset-primary.html',
+      'toolset-secondary': 'toolset-secondary.html',
+      'panel-east': 'control-panel.html'
+    }
+  }]"
+>Loading...</metro-designer>

@@ -1,12 +1,28 @@
-import { Component, ViewChild, ElementRef, ViewEncapsulation, NgZone } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  ViewEncapsulation,
+  ViewChild,
+} from '@angular/core';
+
+
 let Metro = require("../vendor/metrojs/metro").Metro;
 let metro = null;
+
+interface Plugin {
+  name: string,
+  base: string,
+  partials: any
+};
 
 interface Line {
   x1?: number;
   x2?: number;
   y1?: number;
   y2?: number;
+  type?: string;
 };
 
 interface Joint {
@@ -27,21 +43,37 @@ interface App {
   selector: 'metro-designer',
   templateUrl: './designer.component.html',
   styleUrls: ['./designer.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  inputs: ['plugins'],
 })
 export class DesignerComponent {
+  public content: string = 'foobar';
+  public toolset: string;
+  public plugins: Plugin[] = [];
   public title: string = 'Metro Designer';
   public app: App = {
     metroLines: [],
     currentEditJoint: { data: {} },
     scalePercentage: 100.00,
   };
-  constructor(private zone: NgZone) {};
 
-  @ViewChild('container') container:ElementRef;
+  constructor(
+    private zone: NgZone
+  ) {
+
+  };
+
+  @ViewChild('container') container: ElementRef;
+
+  ngOnInit(): void {
+  };
 
   ngAfterViewInit(): void {
     let self = this;
+    self.zone.run(() => {
+    });
+
+    let startScale = 0.76;
     let app = this.app;
     let def = {
       pointerRadius: 10,
@@ -52,10 +84,45 @@ export class DesignerComponent {
       inputMode: 'draw',
       pathType: 'straight',
     };
+
     metro = new Metro(def);
+
+    this.plugins.forEach((plugin) => {
+      //let tpl = require('./plugins/station/partials/control-panel.html');
+      let tpl = require('./plugins/station/partials/toolset-primary.html');
+      self.zone.run(() => {
+        self.content = tpl;
+      });
+      //console.log(plugin.name, tpl);
+    });
+
     metro.on('zooming', function(transform) {
       self.zone.run(() => {
         app.scalePercentage = parseFloat((transform.k * 100).toFixed(2));
+      });
+    });
+
+    metro.on('jointDrag', function(jointData) {
+      self.zone.run(() => {
+        app.currentEditJoint = jointData;
+      });
+    });
+  
+    metro.on('jointMouseDown', function(jointData) {
+      self.zone.run(() => {
+        app.currentEditJoint = jointData;
+      });
+    });
+  
+    metro.on('splashButtonClick', function() {
+      self.zone.run(() => {
+        self.newMetroLine();
+      });
+    });
+  
+    metro.on('canvasMouseClick', function(shadePos) {
+      self.zone.run(() => {
+      //console.log(shadePos)
       });
     });
 
@@ -63,27 +130,25 @@ export class DesignerComponent {
     app.pathType = metro.getPathType();
     app.canvasWidth = metro.width;
     app.canvasHeight = metro.height;
-
+    this.center(app.canvasWidth/2*(1-startScale), app.canvasHeight/2*(1-startScale), startScale);
   }
+
+  zoomIn(): void {
+    metro.zoomIn(1.5);
+  }; 
+
+  zoomOut(): void {
+    metro.zoomOut(0.75);
+  }; 
+
+  center(x, y, k): void {
+    metro.center(null, null, 1);
+  }; 
 
   newMetroLine(): void {
     const metroLine = metro.addMetroLine();
     metro.setCurrentMetroLine(metroLine);
     this.app.metroLines = metro.getMetroLines();
-  };
-
-  draw(): void {
-    this.app.inputMode = metro.setInputMode('draw');
-    const el = metro.getElements();
-    el.pointer.
-      classed('hide', false)
-    ;
-    el.shade.
-      classed('hide', false)
-    ;
-    el.svg.
-      classed('input-mode-select', false)
-    ;
   };
 
   editMetroLine(): void {
@@ -100,17 +165,19 @@ export class DesignerComponent {
     ;
   };
 
-  zoomIn(): void {
-    metro.zoomIn(1.5);
-  }; 
-
-  zoomOut(): void {
-    metro.zoomOut(0.75);
-  }; 
-
-  center(x, y, k): void {
-    metro.center(null, null, 1);
-  }; 
+  draw(): void {
+    this.app.inputMode = metro.setInputMode('draw');
+    const el = metro.getElements();
+    el.pointer.
+      classed('hide', false)
+    ;
+    el.shade.
+      classed('hide', false)
+    ;
+    el.svg.
+      classed('input-mode-select', false)
+    ;
+  };
 
   useStraightPath() {
     this.app.pathType = metro.setPathType('straight');
@@ -141,5 +208,53 @@ export class DesignerComponent {
 
   setCurrentEditJointType(type: string): void {
     this.app.currentEditJoint.data.type = type;
+  };
+
+  applyLinePathChange = function() {
+    let linePathJoint = metro.getCurrentEditJoint();
+    metro.drawLinePath(
+      linePathJoint.data.x1, linePathJoint.data.y1,
+      linePathJoint.data.x2, linePathJoint.data.y2,
+      linePathJoint.data.type,
+      linePathJoint.data.flipped,
+      linePathJoint.linePath
+    );
+  };
+
+  splitLinePath = function() {
+    const linePathJoint = metro.getCurrentEditJoint();
+    const d = linePathJoint.data;
+    const dx = (d.x2 - d.x1)/2;
+    const dy = (d.y2 - d.y1)/2;
+    const left = {
+      x1: d.x1, y1: d.y1,
+      x2: d.x1 + dx, y2: d.y1 + dy,
+      type: d.type,
+      flipped: d.flipped
+    };
+    const right = {
+      x1: d.x2 - dx, y1: d.y2 - dy,
+      x2: d.x2, y2: d.y2,
+      type: d.type,
+      flipped: d.flipped
+    };
+
+    metro.drawLinePath(
+      left.x1, left.y1,
+      left.x2, left.y2,
+      left.type, left.flipped,
+      null,
+      linePathJoint.linePath
+    );
+    metro.drawLinePath(
+      right.x1, right.y1,
+      right.x2, right.y2,
+      right.type, right.flipped,
+      null,
+      linePathJoint.linePath
+    );
+
+    linePathJoint.joint.remove();
+    linePathJoint.linePath.remove();
   };
 }

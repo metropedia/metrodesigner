@@ -7,11 +7,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { DesignerComponent } from './designer.component';
+import { ToolsetComponent } from './toolset.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DesignerComponent
+    DesignerComponent,
+    ToolsetComponent
   ],
   imports: [
     BrowserModule,
