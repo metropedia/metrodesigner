@@ -7,49 +7,21 @@ import {
   ViewChild,
 } from '@angular/core';
 
+import './designer';
+import { DesignerService } from './designer.service';
 
 let Metro = require("../vendor/metrojs/metro").Metro;
 let metro = null;
-
-interface Plugin {
-  name: string,
-  base: string,
-  partials: any
-};
-
-interface Line {
-  x1?: number;
-  x2?: number;
-  y1?: number;
-  y2?: number;
-  type?: string;
-};
-
-interface Joint {
-  data: Line;
-};
-
-interface App {
-  canvasWidth?: number;
-  canvasHeight?: number;
-  inputMode?: string;
-  pathType?: string;
-  metroLines: any[];
-  currentEditJoint: Joint;
-  scalePercentage: number;
-};
 
 @Component({
   selector: 'metro-designer',
   templateUrl: './designer.component.html',
   styleUrls: ['./designer.component.css'],
   encapsulation: ViewEncapsulation.None,
-  inputs: ['plugins'],
 })
 export class DesignerComponent {
-  public content: string = 'foobar';
-  public toolset: string;
-  public plugins: Plugin[] = [];
+  @ViewChild('container') container: ElementRef;
+  public toolsets: Toolset[];
   public title: string = 'Metro Designer';
   public app: App = {
     metroLines: [],
@@ -58,21 +30,35 @@ export class DesignerComponent {
   };
 
   constructor(
-    private zone: NgZone
-  ) {
+    private zone: NgZone,
+    private service: DesignerService
+  ) { };
 
+  getPrimaryToolsets(): Toolset[] {
+    return this.service.getToolsets();
   };
 
-  @ViewChild('container') container: ElementRef;
-
   ngOnInit(): void {
+    console.log('designer.component');
+
+    this.service.setAppContext(this);
+
+    this.service.addToolsets([{
+      title: 'Draw',
+      inputMode: 'draw',
+      action: this.draw,
+      section: 'primary',
+    }, {
+      title: 'Edit',
+      inputMode: 'edit',
+      action: this.editMetroLine,
+      section: 'primary',
+    }]);
+
   };
 
   ngAfterViewInit(): void {
     let self = this;
-    self.zone.run(() => {
-    });
-
     let startScale = 0.76;
     let app = this.app;
     let def = {
@@ -86,15 +72,6 @@ export class DesignerComponent {
     };
 
     metro = new Metro(def);
-
-    this.plugins.forEach((plugin) => {
-      //let tpl = require('./plugins/station/partials/control-panel.html');
-      let tpl = require('./plugins/station/partials/toolset-primary.html');
-      self.zone.run(() => {
-        self.content = tpl;
-      });
-      //console.log(plugin.name, tpl);
-    });
 
     metro.on('zooming', function(transform) {
       self.zone.run(() => {
