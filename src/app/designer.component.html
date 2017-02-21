@@ -13,14 +13,10 @@
                 [disabled]="0"
                 (click)="newMetroLine();">New Metro Line</button>
         <div class="toolset-primary btn-group btn-group-sm">
-          <button class="btn btn-sm"
-                  [ngClass]="{'btn-primary': app.inputMode == 'draw'}"
-                  (click)="draw();">Draw</button>
-          <button class="btn btn-sm"
-                  [ngClass]="{'btn-primary': app.inputMode == 'edit'}"
-                  (click)="editMetroLine();">Edit</button>
-          <!--Metro Station Implement-->
-          <toolset></toolset>
+          <button *ngFor="let toolset of getPrimaryToolsets()"
+                  class="btn btn-sm"
+                  [ngClass]="{'btn-primary': app.inputMode == toolset.inputMode }"
+                  (click)="toolset.action.call(this);">{{toolset.title}}</button>
         </div>
 
         <button class="btn btn-sm">Save</button>

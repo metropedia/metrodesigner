@@ -1,11 +1,12 @@
 <metro-designer
   [plugins]="[{
-    name: 'MetroStation',
-    base: '../src/plugins/station/',
-    partials: {
-      'toolset-primary': 'toolset-primary.html',
-      'toolset-secondary': 'toolset-secondary.html',
-      'panel-east': 'control-panel.html'
-    }
+    title: 'MetroStation',
+    module: './plugins/station/main',
+    primaryToolsets: [{
+      title: 'Implement',
+      inputMode: 'implement',
+      action: 'foo',
+      section: 'primary'
+    }]
   }]"
 >Loading...</metro-designer>

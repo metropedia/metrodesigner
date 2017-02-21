@@ -7,13 +7,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { DesignerComponent } from './designer.component';
-import { ToolsetComponent } from './toolset.component';
+import { PluginComponent } from './plugin.component';
+import { DesignerService } from './designer.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     DesignerComponent,
-    ToolsetComponent
+    PluginComponent
   ],
   imports: [
     BrowserModule,
@@ -21,7 +22,7 @@ import { ToolsetComponent } from './toolset.component';
     HttpModule,
     NgbModule.forRoot()
   ],
-  providers: [],
+  providers: [DesignerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
