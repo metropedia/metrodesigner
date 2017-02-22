@@ -19,17 +19,3 @@ interface App {
   currentEditJoint: Joint;
   scalePercentage: number;
 };
-
-interface Toolset {
-  title: string;
-  inputMode: string;
-  action?: any;
-  section: string;
-};
-
-interface Plugin {
-  title: string;
-  module: string;
-  primaryToolsets: Toolset[];
-};
-
