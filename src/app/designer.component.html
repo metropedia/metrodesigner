@@ -1,3 +1,6 @@
+<template #primaryToolset><!--primaryToolset--></template>
+<template #secondaryToolset><!--secondaryToolset--></template>
+<template #panelEast><!--panelEast--></template>
 <div class="root">
   <div class="panel-north">
     <div>
@@ -13,10 +16,13 @@
                 [disabled]="0"
                 (click)="newMetroLine();">New Metro Line</button>
         <div class="toolset-primary btn-group btn-group-sm">
-          <button *ngFor="let toolset of getPrimaryToolsets()"
-                  class="btn btn-sm"
-                  [ngClass]="{'btn-primary': app.inputMode == toolset.inputMode }"
-                  (click)="toolset.action.call(this);">{{toolset.title}}</button>
+          <button class="btn btn-sm"
+                  [ngClass]="{'btn-primary': app.inputMode == 'draw'}"
+                  (click)="draw();">Draw</button>
+          <button class="btn btn-sm"
+                  [ngClass]="{'btn-primary': app.inputMode == 'edit'}"
+                  (click)="editMetroLine();">Edit</button>
+          <template [ngTemplateOutlet]="primaryToolset"></template>
         </div>
 
         <button class="btn btn-sm">Save</button>
@@ -104,13 +110,11 @@
                   [disabled]="0"
                   (click)="splitLinePath();">Split</button>
       </div>
-      <div class="toolset-secondary "></div>
-      <!--sub toolset of Metro Implement-->
+      <template [ngTemplateOutlet]="secondaryToolset"></template>
       <div #container></div>
     </div>
   </div>
   <div class="panel-east">
-    <!--Default Developer Panel-->
-    <!--Plugin Panels-->
+    <template [ngTemplateOutlet]="panelEast"></template>
   </div>
 </div>

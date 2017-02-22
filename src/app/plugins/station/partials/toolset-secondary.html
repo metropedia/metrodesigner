@@ -1,6 +1,6 @@
 <div class="control-panel ng-hide"
-     ng-show="app.inputMode == 'implement'">
-  <button class="btn btn-xs"
-          ng-disabled="0"
-          ng-click="app.addStation()">Add Station</button>
+     [hidden]="app.inputMode != 'implement'">
+  <button class="btn btn-sm"
+          [disabled]="0"
+          (click)="addStation()">Add Station</button>
 </div>

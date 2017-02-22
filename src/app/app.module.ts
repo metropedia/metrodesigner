@@ -7,14 +7,12 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { DesignerComponent } from './designer.component';
-import { PluginComponent } from './plugin.component';
 import { DesignerService } from './designer.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DesignerComponent,
-    PluginComponent
+    DesignerComponent
   ],
   imports: [
     BrowserModule,
