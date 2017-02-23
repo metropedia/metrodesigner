@@ -1,5 +1,8 @@
+import 'hammerjs';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { MaterialModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
@@ -18,6 +21,7 @@ import { DesignerService } from './designer.service';
     BrowserModule,
     FormsModule,
     HttpModule,
+    MaterialModule.forRoot(),
     NgbModule.forRoot()
   ],
   providers: [DesignerService],

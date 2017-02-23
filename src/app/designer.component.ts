@@ -5,6 +5,7 @@ import {
   NgZone,
   ViewEncapsulation,
   ViewChild,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import './designer';
@@ -18,9 +19,12 @@ let preloadPluginTemplates = (template) => {
     let toolsetPrimary = require('' + dir + plugin.partials['toolset-primary']);
     let toolsetSecondary = require('' + dir + plugin.partials['toolset-secondary']);
     let panelEast = require('' + dir + plugin.partials['panel-east']);
-    template = template.replace('<!--primaryToolset-->', toolsetPrimary);
-    template = template.replace('<!--secondaryToolset-->', toolsetSecondary);
-    template = template.replace('<!--panelEast-->', panelEast);
+    let p1 = '<!--primaryToolset-->';
+    let p2 = '<!--secondaryToolset-->';
+    let p3 = '<!--panelEast-->';
+    template = template.replace(p1, p1 + toolsetPrimary);
+    template = template.replace(p2, p2 + toolsetSecondary);
+    template = template.replace(p3, p3 + panelEast);
   });
   return template;
 };
@@ -33,6 +37,7 @@ let preloadPluginTemplates = (template) => {
 })
 export class DesignerComponent {
   @ViewChild('container') container: ElementRef;
+  @ViewChild('layoutSouth') layoutSouth: ElementRef;
   public title: string = 'Metro Designer';
   public app: App = {
     metroLines: [],
@@ -43,7 +48,8 @@ export class DesignerComponent {
 
   constructor(
     private zone: NgZone,
-    private service: DesignerService
+    private service: DesignerService,
+    private changeDetectionRef: ChangeDetectorRef
   ) { };
 
   ngOnInit(): void {
@@ -59,10 +65,12 @@ export class DesignerComponent {
     let self = this;
     let startScale = 0.76;
     let app = this.app;
+    let width = this.layoutSouth.nativeElement.offsetWidth;
+    let height = this.layoutSouth.nativeElement.offsetHeight;
     let def = {
       pointerRadius: 10,
-      width: 800,
-      height: 500,
+      width: width,
+      height: height,
       resolution: 20,
       container: this.container.nativeElement,
       inputMode: 'draw',
@@ -106,7 +114,8 @@ export class DesignerComponent {
     app.canvasWidth = this.metro.width;
     app.canvasHeight = this.metro.height;
     this.center(app.canvasWidth/2*(1-startScale), app.canvasHeight/2*(1-startScale), startScale);
-  }
+    this.changeDetectionRef.detectChanges();
+  };
 
   zoomIn(): void {
     this.metro.zoomIn(1.5);
