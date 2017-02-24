@@ -1,13 +1,3 @@
-html, body, md-sidenav-container {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-}
-md-sidenav {
-  width: 200px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
 .layout {
   height: 100%;
   display: flex;
