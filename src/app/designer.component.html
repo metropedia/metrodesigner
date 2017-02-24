@@ -9,6 +9,7 @@
   </div>
   <md-sidenav #sidenav mode="side" opened="true" align="end">
     <template [ngTemplateOutlet]="panelEast"></template>
+    <h5>Library</h5> 
   </md-sidenav>
 </md-sidenav-container>
 
@@ -28,9 +29,6 @@
       <button class="btn btn-sm">Set Size</button>
     </div>
     <div class="control-panel">
-      <button class="btn btn-sm"
-              [disabled]="0"
-              (click)="newMetroLine();">New Metro Line</button>
       <div class="toolset-primary btn-group btn-group-sm">
         <button class="btn btn-sm"
                 [ngClass]="{'btn-primary': app.inputMode == 'draw'}"
@@ -58,6 +56,9 @@
     </div>
     <div class="control-panel"
          [hidden]="app.inputMode != 'draw'">
+      <button class="btn btn-sm"
+              [disabled]="0"
+              (click)="newMetroLine();">New Metro Line</button>
       <div class="btn-group btn-group-sm">
         <button class="btn btn-sm"
                 [ngClass]="{ 'btn-primary': app.pathType == 'straight' }"
@@ -116,8 +117,7 @@
         </div>
       <label>
       flipped
-        <input type="checkbox" [ngModel]="app.currentEditJoint.data.flipped"
-               (ngModelChange)="evalTrueOrFalse($event)"
+        <input type="checkbox" [(ngModel)]="app.currentEditJoint.data.flipped"
                (change)="applyLinePathChange()">
       </label>
       split
