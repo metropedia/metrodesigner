@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import MetroDesigner from './metrodesigner';
 import './index.css';
 
 ReactDOM.render(
-  <App />,
+  <MetroDesigner />,
   document.getElementById('root')
 );

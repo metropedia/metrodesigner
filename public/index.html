@@ -16,30 +16,6 @@
     <title>Metro Designer</title>
     <script src="/node_modules/systemjs/dist/system.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
-    <script>
-      SystemJS.config({
-        meta: {
-          '/node_modules/d3/build/d3.js': {
-            exports: 'd3'
-          },
-          '/node_modules/d3-selection-multi/build/d3-selection-multi.js': {
-            deps: ['https://d3js.org/d3.v4.min.js'],
-            format: 'global'
-          },
-          '/node_modules/rxjs/bundles/Rx.min.js': {
-            exports: 'Rx'
-          },
-        }
-      });
-
-      Promise.all([
-        SystemJS.import('/node_modules/d3/build/d3.js'),
-        SystemJS.import('/node_modules/d3-selection-multi/build/d3-selection-multi.js'),
-        SystemJS.import('/node_modules/rxjs/bundles/Rx.min.js'),
-      ]).then(function() {
-        console.log('Dependencies injected!');
-      })
-    </script>
   </head>
   <body>
     <div id="root"></div>
