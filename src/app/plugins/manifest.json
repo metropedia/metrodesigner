@@ -1,9 +1,0 @@
-[{
-  "title": "MetroStation",
-  "base": "./plugins/station",
-  "partials": {
-    "toolset-primary": "toolset-primary.html",
-    "toolset-secondary": "toolset-secondary.html",
-    "panel-east": "control-panel.html"
-  }
-}]
