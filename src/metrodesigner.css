@@ -4,8 +4,8 @@
   flex-direction: column;
 }
 .layout-north {
-  background: lightgreen;
   flex: 0 0 100px;
+  overflow: hidden;
 }
 .layout-south {
   flex: 0 1 100%;

@@ -255,7 +255,7 @@ export class MetroBBox {
     // calculate area size in order to find upper left corner
     const min = areas.indexOf(Math.min.apply(Math, areas));
     const max = areas.indexOf(Math.max.apply(Math, areas));
-    console.log(min, sorted[min].name, max, sorted[max].name);
+    //console.log(min, sorted[min].name, max, sorted[max].name);
 
     sorted = [].concat(
       sorted.slice(min, sorted.length)
@@ -422,7 +422,7 @@ const evtHandleDrag = function(proto, dir) {
 
 const evtHandleDragStart = function(proto, dir) {
   return function() {
-    console.log('start')
+    //console.log('start')
   };
 };
 
@@ -440,6 +440,6 @@ const evtHandleDragEnd = function(proto, dir) {
 
     proto.broadcast('resized', transform);
     proto.reset();
-    console.log('end')
+    //console.log('end')
   };
 };
