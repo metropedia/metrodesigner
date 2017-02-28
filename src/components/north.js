@@ -6,63 +6,66 @@ class North extends Component {
   constructor(props) {
     super(props);
     this.ref = {};
-    this.state = {};
   };
 
-  change(event) {
-    this.props.app.change(event);
+  changeCanvasWidth(event) {
+    this.props.changeCanvasWidth(event);
+  };
+
+  changeCanvasHeight(event) {
+    this.props.changeCanvasHeight(event);
   };
 
   draw() {
-    this.props.app.draw();
+    this.props.draw(this.props.metro);
   };
 
   edit() {
-    this.props.app.editMetroLine();
+    this.props.edit(this.props.metro);
   };
 
   zoomIn() {
-    this.props.app.zoomIn();
+    this.props.zoomIn(this.props.metro);
   };
 
   zoomOut() {
-    this.props.app.zoomOut();
+    this.props.zoomOut(this.props.metro);
   };
 
   center() {
-    this.props.app.center();
+    this.props.center(this.props.metro);
   };
 
   newMetroLine() {
-    this.props.app.newMetroLine();
+    this.props.newMetroLine(this.props.metro);
   };
 
   useStraightPath() {
-    this.props.app.useStraightPath();
+    this.props.useStraightPath();
   };
 
   useCurlyPath() {
-    this.props.app.useCurlyPath();
+    this.props.useCurlyPath();
   };
 
   flipLast() {
-    this.props.app.flipLast();
+    this.props.flipLast();
   };
 
   applyLinePathChange() {
-    this.props.app.applyLinePathChange();
+    this.props.applyLinePathChange();
   };
 
   changePathType(type) {
-    this.props.app.changePathType(type);
+    this.props.changePathType(type);
   };
 
   flipPath() {
-    this.props.app.flipPath();
+    this.props.flipPath();
   };
 
   splitLinePath() {
-    this.props.app.splitLinePath();
+    this.props.splitLinePath();
   };
 
   render() {
@@ -71,21 +74,21 @@ class North extends Component {
         <div className="control-panel">
           Width <input type="number" ref={(input) => { this.ref.width = input; }}
                        name="width"
-                       onChange={this.change.bind(this)}
+                       onChange={this.changeCanvasWidth.bind(this)}
                        className="form-control" />
           Height <input type="number" ref={(input) => { this.ref.height = input; }}
                        name="height"
-                       onChange={this.change.bind(this)}
+                       onChange={this.changeCanvasHeight.bind(this)}
                        className="form-control" />
           <Button bsSize="xsmall">Set Size</Button>
           <span style={{float:'right'}}><Toggle /></span>
         </div>
         <div className="control-panel">
           <ButtonGroup>
-            <Button bsStyle={this.inputMode === 'draw' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.inputMode === 'draw' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.draw.bind(this)}>Draw</Button>
-            <Button bsStyle={this.inputMode === 'edit' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.inputMode === 'edit' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.edit.bind(this)}>Edit</Button>
           </ButtonGroup>
@@ -100,20 +103,20 @@ class North extends Component {
           <Button bsSize="xsmall"
                   onClick={this.zoomOut.bind(this)}>Zoom Out -</Button>
     
-          <label>{this.scalePercentage}%</label>
+          <label>{this.props.scalePercentage}%</label>
     
           <Button bsSize="xsmall"
                   onClick={this.center.bind(this)}>Center & 100%</Button>
         </div>
         <div className="control-panel"
-             hidden={this.inputMode !== 'draw'}>
+             hidden={this.props.inputMode !== 'draw'}>
           <Button bsSize="xsmall"
                   onClick={this.newMetroLine.bind(this)}>New Metro Line</Button>
           <ButtonGroup>
-            <Button bsStyle={this.pathType === 'straight' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.pathType === 'straight' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.useStraightPath.bind(this)}>Straight</Button>
-            <Button bsStyle={this.pathType === 'curly' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.pathType === 'curly' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.useCurlyPath.bind(this)}>Curly</Button>
           </ButtonGroup>
@@ -121,7 +124,7 @@ class North extends Component {
                   onClick={this.flipLast.bind(this)}>Flip</Button>
         </div>
         <div className="control-panel input-group-sm"
-             hidden={this.inputMode !== 'edit'}>
+             hidden={this.props.inputMode !== 'edit'}>
           <label>
           x1 <input type="number" step="20"
                     ref={(input) => { this.ref.x1 = input; }}
@@ -148,10 +151,10 @@ class North extends Component {
           </label>
           <label>type</label>
           <ButtonGroup>
-            <Button bsStyle={this.currentEditJoint.data.type === 'straight' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.currentEditJoint.data.type === 'straight' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.changePathType.bind(this, 'straight')}>Straight</Button>
-            <Button bsStyle={this.currentEditJoint.data.type === 'curly' ? 'primary' : 'default'}
+            <Button bsStyle={this.props.currentEditJoint.data.type === 'curly' ? 'primary' : 'default'}
                     bsSize="xsmall"
                     onClick={this.changePathType.bind(this, 'curly')}>Curly</Button>
           </ButtonGroup>
@@ -170,28 +173,23 @@ class North extends Component {
   };
 
   componentWillMount() {
-    let app = this.props.app.state;
-    this.currentEditJoint = app.currentEditJoint;
   };
 
   componentWillUpdate() {
-    let app = this.props.app.state;
-    this.ref.width.value = app.width;
-    this.ref.height.value = app.height;
 
-    if (app.currentEditJoint) {
-      this.currentEditJoint = app.currentEditJoint;
-      this.ref.x1.value = app.currentEditJoint.data.x1 || NaN;
-      this.ref.y1.value = app.currentEditJoint.data.y1 || NaN;
-      this.ref.x2.value = app.currentEditJoint.data.x2 || NaN;
-      this.ref.y2.value = app.currentEditJoint.data.y2 || NaN;
-      this.ref.flipped.checked = this.currentEditJoint.data.flipped;
+  };
+
+  componentDidUpdate() {
+    const props = this.props;
+    this.ref.width.value = props.width;
+    this.ref.height.value = props.height;
+    if (props.currentEditJoint.data) {
+      this.ref.x1.value = props.currentEditJoint.data.x1;
+      this.ref.y1.value = props.currentEditJoint.data.y1;
+      this.ref.x2.value = props.currentEditJoint.data.x2;
+      this.ref.y2.value = props.currentEditJoint.data.y2;
+      this.ref.flipped.checked = props.currentEditJoint.data.flipped;
     }
-
-    this.inputMode = app.inputMode;
-    this.pathType = app.pathType;
-    this.scalePercentage = app.scalePercentage;
-    console.log(this.props.app.state);
   };
 }
 
