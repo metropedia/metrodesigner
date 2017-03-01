@@ -41,31 +41,31 @@ class North extends Component {
   };
 
   useStraightPath() {
-    this.props.useStraightPath();
+    this.props.usePathType(this.props.metro, 'straight');
   };
 
   useCurlyPath() {
-    this.props.useCurlyPath();
+    this.props.usePathType(this.props.metro, 'curly');
   };
 
   flipLast() {
-    this.props.flipLast();
+    this.props.flipLast(this.props.metro);
   };
 
   applyLinePathChange() {
-    this.props.applyLinePathChange();
+    //this.props.applyLinePathChange(this.props.metro);
   };
 
   changePathType(type) {
-    this.props.changePathType(type);
+    this.props.applyLinePathChange(this.props.metro, {type: type});
   };
 
   flipPath() {
-    this.props.flipPath();
+    this.props.applyLinePathChange(this.props.metro, {flipping: true});
   };
 
   splitLinePath() {
-    this.props.splitLinePath();
+    this.props.splitLinePath(this.props.metro);
   };
 
   render() {
@@ -103,7 +103,7 @@ class North extends Component {
           <Button bsSize="xsmall"
                   onClick={this.zoomOut.bind(this)}>Zoom Out -</Button>
     
-          <label>{this.props.scalePercentage}%</label>
+          <label>{(this.props.scalePercentage * 100).toFixed(0)}%</label>
     
           <Button bsSize="xsmall"
                   onClick={this.center.bind(this)}>Center & 100%</Button>

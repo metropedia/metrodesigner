@@ -10,113 +10,6 @@ import './metrodesigner.css';
 injectTapEventPlugin();
 
 class MetroDesigner extends Component {
-  constructor(props) {
-    super(props);
-    this.dispatch = this.props.dispatch;
-    this.state = {};
-  };
-
-  useStraightPath() {
-    this.setState({
-      pathType: this.metro.setPathType('straight')
-    });
-  };
-
-  useCurlyPath() {
-    this.setState({
-      pathType: this.metro.setPathType('curly')
-    });
-  };
-
-  flipLast() {
-    let metroLine = this.metro.getCurrentMetroLine();
-    // eslint-disable-next-line
-    let layerMetroLine = metroLine.layers.metroLine;
-    // eslint-disable-next-line
-    let layerLinePaths = metroLine.layers.linePaths;
-    let layerJoints = metroLine.layers.joints;
-
-    let jointData = layerJoints.select('.joint:last-child').datum();
-    let linePath = jointData.linePath;
-    let linePathData = linePath.datum();
-    linePathData.flipped = !linePathData.flipped;
-    linePathData.linePath = this.metro.drawLinePath(
-      linePathData.x1, linePathData.y1,
-      linePathData.x2, linePathData.y2,
-      linePathData.type,
-      linePathData.flipped,
-      linePath
-    );
-  };
-
-  flipPath() {
-    var flipped = !this.metro.currentEditJoint.data.flipped;
-    this.metro.currentEditJoint.data.flipped = flipped;
-    this.applyLinePathChange();
-    this.setState({
-      currentEditJoint: this.metro.currentEditJoint
-    });
-  };
-
-  changePathType(type) {
-    this.metro.currentEditJoint.data.type = type;
-    this.applyLinePathChange();
-    this.setState({
-      currentEditJoint: this.metro.currentEditJoint
-    });
-  };
-
-  applyLinePathChange() {
-    let linePathJoint = this.metro.getCurrentEditJoint();
-    this.metro.drawLinePath(
-      linePathJoint.data.x1, linePathJoint.data.y1,
-      linePathJoint.data.x2, linePathJoint.data.y2,
-      linePathJoint.data.type,
-      linePathJoint.data.flipped,
-      linePathJoint.linePath
-    );
-  };
-
-  splitLinePath() {
-    const linePathJoint = this.metro.getCurrentEditJoint();
-    const d = linePathJoint.data;
-    const dx = (d.x2 - d.x1)/2;
-    const dy = (d.y2 - d.y1)/2;
-    const left = {
-      x1: d.x1, y1: d.y1,
-      x2: d.x1 + dx, y2: d.y1 + dy,
-      type: d.type,
-      flipped: d.flipped
-    };
-    const right = {
-      x1: d.x2 - dx, y1: d.y2 - dy,
-      x2: d.x2, y2: d.y2,
-      type: d.type,
-      flipped: d.flipped
-    };
-
-    this.metro.drawLinePath(
-      left.x1, left.y1,
-      left.x2, left.y2,
-      left.type, left.flipped,
-      null,
-      linePathJoint.linePath
-    );
-    this.metro.drawLinePath(
-      right.x1, right.y1,
-      right.x2, right.y2,
-      right.type, right.flipped,
-      null,
-      linePathJoint.linePath
-    );
-
-    linePathJoint.joint.remove();
-    linePathJoint.linePath.remove();
-
-    this.setState({
-      currentEditJoint: linePathJoint
-    });
-  };
 
   render() {
     return (
@@ -134,61 +27,49 @@ class MetroDesigner extends Component {
   };
 
   componentDidMount() {
-    let container = this.container;
-    const change = {
-      type: 'INIT',
-      states: {
-        inputMode: 'draw',
-        pathType: 'straight',
-        width: container.offsetWidth,
-        height: container.offsetHeight,
-        container: container,
-      }
+    const container = this.container;
+    const def = {
+      width: container.offsetWidth,
+      height: container.offsetHeight,
+      container: container,
     };
-    this.dispatch(change);
+    const metro = new Metro(def);
+
+    /*
+    metro.on('zooming', function(transform) {
+      this.props.zooming(metro, transform);
+    }.bind(this));
+    */
+
+    metro.on('jointDrag', function(jointData) {
+      this.props.jointDrag(metro, jointData);
+    }.bind(this));
+    
+    metro.on('jointMouseDown', function(jointData) {
+      this.props.jointMouseDown(metro, jointData);
+    }.bind(this));
+    
+    metro.on('splashButtonClick', function() {
+      this.props.newMetroLine(metro);
+    }.bind(this));
+    
+    metro.on('canvasMouseClick', function(shadePos) {
+      this.props.canvasMouseClick(metro);
+    }.bind(this));
+
+    this.props.init(def);
+
+    this.props.center(
+      metro,
+      metro.width/2*(1-this.props.scalePercentage),
+      metro.height/2*(1-this.props.scalePercentage),
+      this.props.scalePercentage
+    );
+
+    this.metro = metro;
   };
 
   componentDidUpdate() {
-    if (!this.metro) {
-      const def = this.props;
-      this.metro = new Metro(def);
-      this.metro.on('zooming', function(transform) {
-        const action = {
-          type: 'ZOOMING',
-          scalePercentage: parseFloat((transform.k * 100).toFixed(2))
-        };
-        this.dispatch(action);
-      }.bind(this));
-  
-      this.metro.on('jointDrag', function(jointData) {
-        this.setState({
-          currentEditJoint: jointData
-        });
-      }.bind(this));
-    
-      this.metro.on('jointMouseDown', function(jointData) {
-        this.setState({
-          currentEditJoint: jointData
-        });
-      }.bind(this));
-    
-      this.metro.on('splashButtonClick', function() {
-        this.props.newMetroLine(this.metro);
-      }.bind(this));
-    
-      this.metro.on('canvasMouseClick', function(shadePos) {
-        this.setState({
-          metroLines: this.metro.getMetroLines()
-        });
-      }.bind(this));
-  
-      this.props.center(
-        this.metro,
-        this.metro.width/2*(1-def.scalePercentage),
-        this.metro.height/2*(1-def.scalePercentage),
-        def.scalePercentage
-      );
-    }
   };
 }
 
@@ -200,15 +81,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch: dispatch,
-
     newMetroLine(metro) {
       const action = {
         type: 'NEW_METRO_LINE',
-        states: {
-          metroLines: metro.getMetroLines(),
-          currentMetroLine: metro.setCurrentMetroLine(metro.addMetroLine())
-        }
+        metroLines: metro.getMetroLines(),
+        currentMetroLine: metro.setCurrentMetroLine(metro.addMetroLine())
       };
       dispatch(action);
     },
@@ -256,17 +133,162 @@ function mapDispatchToProps(dispatch) {
     },
 
     zoomIn(metro) {
-      metro.zoomIn(1.5);
+      const action = {
+        type: 'ZOOMING',
+        scaleBy: 1.5
+      };
+      metro.zoomIn(action.scaleBy);
+      dispatch(action);
     }, 
   
     zoomOut(metro) {
-      metro.zoomOut(0.75);
+      const action = {
+        type: 'ZOOMING',
+        scaleBy: 0.75
+      };
+      metro.zoomOut(action.scaleBy);
+      dispatch(action);
     }, 
   
     center(metro, x, y, k) {
+      const action = {
+        type: 'CENTER',
+        scalePercentage: k || 1
+      };
       metro.center(x, y, k);
+      dispatch(action);
     },
 
+    usePathType(metro, type) {
+      const action = {
+        type: 'USE_PATH_TYPE',
+        pathType: metro.setPathType(type)
+      };
+      dispatch(action);
+    },
+
+    flipLast(metro) {
+      let metroLine = metro.getCurrentMetroLine();
+      // eslint-disable-next-line
+      let layerMetroLine = metroLine.layers.metroLine;
+      // eslint-disable-next-line
+      let layerLinePaths = metroLine.layers.linePaths;
+      let layerJoints = metroLine.layers.joints;
+  
+      let jointData = layerJoints.select('.joint:last-child').datum();
+      let linePath = jointData.linePath;
+      let linePathData = linePath.datum();
+      metro.drawLinePath(
+        linePathData.x1, linePathData.y1,
+        linePathData.x2, linePathData.y2,
+        linePathData.type,
+        !linePathData.flipped,
+        linePath
+      );
+      const action = {
+        type: 'FLIP_LAST',
+        metroLines: metro.getMetroLines()
+      };
+      dispatch(action);
+    },
+
+    applyLinePathChange(metro, data = {}) {
+      let linePathJoint = metro.getCurrentEditJoint();
+      let linePath = metro.drawLinePath(
+        linePathJoint.data.x1, linePathJoint.data.y1,
+        linePathJoint.data.x2, linePathJoint.data.y2,
+        data.type || linePathJoint.data.type,
+        data.flipping ? !linePathJoint.data.flipped : linePathJoint.data.flipped,
+        linePathJoint.linePath
+      );
+      metro.setCurrentEditJoint({
+        data: linePath.datum(),
+        joint: linePathJoint.joint,
+        linePath: linePath
+      })
+      const action = {
+        type: 'APPLY_PATH_CHANGE',
+        currentEditJoint: metro.getCurrentEditJoint()
+      };
+      dispatch(action);
+    },
+
+    splitLinePath(metro) {
+      const linePathJoint = metro.getCurrentEditJoint();
+      const d = linePathJoint.data;
+      const dx = (d.x2 - d.x1)/2;
+      const dy = (d.y2 - d.y1)/2;
+      const left = {
+        x1: d.x1, y1: d.y1,
+        x2: d.x1 + dx, y2: d.y1 + dy,
+        type: d.type,
+        flipped: d.flipped
+      };
+      const right = {
+        x1: d.x2 - dx, y1: d.y2 - dy,
+        x2: d.x2, y2: d.y2,
+        type: d.type,
+        flipped: d.flipped
+      };
+
+      metro.drawLinePath(
+        left.x1, left.y1,
+        left.x2, left.y2,
+        left.type, left.flipped,
+        null,
+        linePathJoint.linePath
+      );
+      metro.drawLinePath(
+        right.x1, right.y1,
+        right.x2, right.y2,
+        right.type, right.flipped,
+        null,
+        linePathJoint.linePath
+      );
+  
+      linePathJoint.joint.remove();
+      linePathJoint.linePath.remove();
+
+      metro.updateBBox();
+
+      const action = {
+        type: 'SPLIT_PATH',
+        metroLines: metro.getMetroLines()
+      };
+      dispatch(action);
+    },
+
+    jointDrag(metro, jointData) {
+      const action = {
+        type: 'JOINT_DRAG',
+        currentEditJoint: jointData
+      };
+      dispatch(action);
+    },
+
+    jointMouseDown(metro, jointData) {
+      const action = {
+        type: 'JOINT_MOUSE_DOWN',
+        currentEditJoint: jointData
+      };
+      dispatch(action);
+    },
+
+    canvasMouseClick(metro) {
+      const action = {
+        type: 'CANVAS_MOUSE_CLICK',
+        metroLines: metro.getMetroLines()
+      };
+      dispatch(action);
+    },
+
+    init(def) {
+      const action = {
+        type: 'INIT',
+        def: def
+      };
+      dispatch(action);
+    }
 
   };
 }
